@@ -1,0 +1,300 @@
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+<style>
+body {
+	background-color: #000;
+	color: #fff;
+	font-family: Lucida Sans, Verdana, Arial, Sans-Serif;
+	font-size: 2.5em;
+}
+#calArea {display: block;
+	top: 0;
+	width: 800px;
+	height: auto;
+	background-color: transparent;
+	padding: 1px 0;
+	top: 10px;
+	font-size: 0.75em;
+	text-align: left;
+	}
+.day {display: block;
+	float: left;
+	width: 94px;
+	height: 94px;
+	text-align: left;
+	clear: none;
+	padding: 5px;
+	margin: 1px;
+	background-color: #111;
+	border: 1px solid transparent;
+}
+.day.current {
+	animation: currentDay 10s infinite;
+}
+.day.header {
+	font-size: 0.5em;
+	text-align: center;
+	height: 1em;
+	line-height: 1em;
+	background-color: #000;
+	color: #fff;
+}
+.month {
+	text-align: right;
+	font-size: 0.5em;
+}
+.holiday {
+	text-align: right;
+	font-size: 0.3em;
+	margin-bottom: 1em;
+}
+.weather, .highTemp, .lowTemp {
+	display: block;
+	width: 100%;
+	clear: both;
+	font-size: 0.3em;
+	text-align: right;
+}
+.highTemp {
+	color: pink;
+}
+.lowTemp {
+	color: lightblue;
+}
+#content {
+	text-align: center;
+	display: block;
+	width: 750px;
+	position: absolute;
+	left: 50%;
+	margin-left: -375px;
+}
+#dayName, #time {
+	display: inline;
+	margin: 0.2em;
+}
+#time {
+	float:right;
+	font-size: 0.5em;
+	text-align: right;
+}
+/*
+.month0 { background-color: #ffffff; }
+.month1 { background-color: #fefefe; }
+.month2 { background-color: #fdfdfd; }
+.month3 { background-color: #fcfcfc; }
+.month4 { background-color: #fbfbfb; }
+.month5 { background-color: #fafafa; }
+.month6 { background-color: #f9f9f9; }
+.month7 { background-color: #eee; }
+.month8 { background-color: #ededed; }
+.month9 { background-color: #ddd; }
+.month10 { background-color: #dcdcdc; }
+.month11 { background-color: #ccc; }
+*/
+
+@keyframes currentDay {
+	0% { background-color: #fff;color: #000; }
+	50% { 	background-color: #111;color: #fff; }
+	100% { background-color: #fff;color: #000; }
+}
+
+</style>
+<script>
+function makeCal(id){
+	var output = "";
+	var theyear;
+	var themonth;
+	var theday;
+
+	var staticHolidays = {
+		"1-1": "New Year's Day",
+		"2-2": "Groundhog Day",
+		"2-14": "Valentine's Day",
+		"3-17": "St. Patrick's Day",
+		"4-22": "Earth Day",
+		"5-4": "Star Wars Day",
+		"7-4": "Independence Day",
+		"9-11": "Patriot Day",
+		"10-31": "Halloween",
+		"11-11": "Veterans' Day",
+		"12-7": "Pearl Harbor Day",
+		"12-25": "Christmas Day",
+		"12-31": "New Year's Eve"
+	}
+	var dynamicHolidays = { // keys are formatted as month,week,day
+		"0,2,1": "Martin Luther King, Jr. Day",
+		"1,1,1": "President's Day",
+		"2,1,0": "Daylight Savings Time Begins",
+		"3,3,3": "Administrative Assistants Day",
+		"4,1,0": "Mother's Day",
+		"4,-1,1": "Memorial Day",
+		"5,2,0": "Father's Day",
+		"6,2,0": "Parents Day",
+		"8,0,1": "Labor Day",
+		"8,1,0": "Grandparents Day",
+		"8,-1,0": "Gold Star Mothers Day",
+		"9,1,1": "Columbus Day",
+		"10,0,0": "Daylight Savings Time Ends",
+		"10,3,4": "Thanksgiving Day",
+		"5,6,6": "Test Holiday"
+	};
+
+
+	var days=new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+	var months=new Array ("January","February","March","April","May","June","July","August","September","October","November","December");
+	var last = new Date();
+	last.setFullYear(theyear,(themonth-1),theday);
+	var today=new Date();
+	today.setDate(today.getDate()-7);
+	var startPoint = today.getDay();
+	today.setDate(today.getDate() - startPoint);
+	var forecast = 70
+	startPoint = 0;
+	
+	for ( var i in days ){
+		output += "<div class='day header'>"+days[i]+"</div>";
+	}
+	output += "<br/>";
+
+	row = startPoint;
+	for (a=0;a<forecast;a++){
+		var addTime = "";
+		var useClass = "day month"+today.getMonth();
+		useID = ((today.getMonth()+1)+"-"+("0"+today.getDate()).toString().slice(-2));
+		if ( today.toString() == new Date().toString() ){
+			useClass += " current";
+			addTime += "<br/><div id='time'>";
+			var p = " AM";
+			if ( new Date().getHours() < 13 ){
+				addTime += new Date().getHours()+":";	
+			}
+			else {
+				addTime += (new Date().getHours()-12)+":";	
+				p = " PM";	
+			}
+			addTime += ("0"+new Date().getMinutes()).slice(-2);
+			addTime += p;
+			addTime += "</div>";	
+		}
+		output +=  "<div id='"+useID+"' class='"+useClass+"'>";
+		output +=  today.getDate();
+		output += addTime;
+		if (today.getDate()==1 || a==0){
+			output += "<div class='month'>"+months[today.getMonth()]+"</div>";
+		}
+
+		if ( typeof(staticHolidays[useID]) != "undefined" ){
+			output += "<div class='holiday'>"+staticHolidays[useID]+"</div>";
+		}
+
+			//month,week,day
+		let theweek = Math.floor(today.getDate()/7);
+		let checkStatic = today.getMonth()+","+theweek+","+today.getDay();
+		if ( typeof(dynamicHolidays[checkStatic]) != "undefined" ){
+			output += "<div class='holiday'>"+dynamicHolidays[checkStatic]+"</div>";
+		}
+
+		output += ("</div>");
+		today.setDate(today.getDate()+1);
+		row=row+1;
+		if ( row > 7 ){
+			output += "<br>";
+			row = 0;
+		}
+	}
+	if ( document.getElementById(id) ){
+		document.getElementById(id).innerHTML = output;
+	}
+}
+
+function setContent(){
+	var dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+	var content = "";
+
+/*	content += "<span id='dayName'>"+dayNames[new Date().getDay()]+"&nbsp;</span>";
+	content += "<span id='date'>";
+	content += new Date().getMonth()+1+"/";
+	content += new Date().getDate()+"/";
+	content += new Date().getFullYear();
+	content += "&nbsp;</span>";
+	
+	content += "<span id='time'>";
+	var p = " AM";
+	if ( new Date().getHours() < 12 ){
+		content += new Date().getHours()+":";	
+	}
+	else {
+		content += ((new Date().getHours())-12)+":";	
+		p = " PM";	
+	}
+	content += ("0"+new Date().getMinutes()).slice(-2);
+	content += p;
+	content += "</span>";*/
+	content += "<div id='calArea'></div>";
+	
+	document.getElementById("content").innerHTML = content;
+	makeCal("calArea");
+	getWeather();
+	var t = setTimeout(function(){setContent();},60000);
+}
+
+function getDate(year, month, week, day) {
+    var firstDay = 1;
+    if (week < 0) {
+        month++;
+        firstDay--;
+    }
+    var date = new Date(year, month, (week * 7) + firstDay);
+    date.setDate(date.getDate() - date.getDay() + day);
+    return date;
+}
+function getHoliday(month, week, day) {
+    return holidays[month + "," + week + "," + day];
+}
+function getDateString(year, month, week, day) {
+    var date = getDate(year, month, week, day);
+    var holiday = getHoliday(month, week, day);
+    var dateString = date.toLocaleDateString();
+    if (holiday) {
+        dateString += " \xa0\xa0\xa0" + holiday;
+    }
+    return dateString;
+}
+
+function getWeather(){
+	var httpRequest = new XMLHttpRequest();
+	httpRequest.onreadystatechange = function() {
+	if (httpRequest.readyState === 4) {
+		if (httpRequest.status === 200) {
+			var data = JSON.parse(httpRequest.responseText);
+			for ( var i in data.properties.periods ){
+				let tData = data.properties.periods[i];
+				// console.log(tData);
+				let parts = tData.startTime.split("-");
+				let targetDiv = parts[1]+"-"+parts[2].split("T")[0];
+				let tempDiv = document.createElement("div");
+					tempDiv.className = "weather";
+				if ( tData.isDaytime === true ){
+					tempDiv.className = "highTemp";
+				}
+				else if ( tData.isDaytime === false ){
+					tempDiv.className = "lowTemp";
+				}
+				tempDiv.innerHTML = tData.temperature;//+tData.temperatureUnit;
+				// console.log(targetDiv);
+				document.getElementById(targetDiv).appendChild(tempDiv);
+			}
+		}
+	}
+};
+httpRequest.open('GET', "https://api.weather.gov/gridpoints/PBZ/67,67/forecast");
+httpRequest.send(); 
+}
+</script>
+</head>
+<body onload="setContent();">
+<div id="content"></div>
+</body>
