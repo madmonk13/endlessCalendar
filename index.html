@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
@@ -9,7 +10,11 @@ body {
 	font-family: Lucida Sans, Verdana, Arial, Sans-Serif;
 	font-size: 2.5em;
 }
-#calArea {display: block;
+#calArea {display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
 	top: 0;
 	width: 800px;
 	height: auto;
@@ -21,14 +26,20 @@ body {
 	}
 .day {display: block;
 	float: left;
-	width: 94px;
-	height: 94px;
+	width: 100px;
+	height: 100px;
 	text-align: left;
 	clear: none;
 	padding: 5px;
 	margin: 1px;
 	background-color: #111;
 	border: 1px solid transparent;
+}
+.more {
+	width: 100%;
+	color: white;
+	font-size: 24px;
+	text-align: center;
 }
 .day.current {
 	animation: currentDay 10s infinite;
@@ -103,7 +114,9 @@ body {
 
 </style>
 <script>
-function makeCal(id){
+var forecast = 12*7;
+var id = "calArea";
+function makeCal(){
 	var output = "";
 	var theyear;
 	var themonth;
@@ -151,7 +164,6 @@ function makeCal(id){
 	today.setDate(today.getDate()-7);
 	var startPoint = today.getDay();
 	today.setDate(today.getDate() - startPoint);
-	var forecast = 70
 	startPoint = 0;
 	
 	for ( var i in days ){
@@ -183,7 +195,11 @@ function makeCal(id){
 		output +=  today.getDate();
 		output += addTime;
 		if (today.getDate()==1 || a==0){
-			output += "<div class='month'>"+months[today.getMonth()]+"</div>";
+			output += "<div class='month'>"+months[today.getMonth()];
+				if ( today.getMonth() == 0 || a == 0 ){
+					output += "<br/>"+today.getFullYear().toString();
+				}
+			output += "</div>";
 		}
 
 		if ( typeof(staticHolidays[useID]) != "undefined" ){
@@ -206,6 +222,7 @@ function makeCal(id){
 		}
 	}
 	if ( document.getElementById(id) ){
+		output += "<button class='day more' onclick='forecast+=28;makeCal();'>(click for more)</button>";
 		document.getElementById(id).innerHTML = output;
 	}
 }
@@ -236,7 +253,7 @@ function setContent(){
 	content += "<div id='calArea'></div>";
 	
 	document.getElementById("content").innerHTML = content;
-	makeCal("calArea");
+	makeCal(id);
 	// getWeather();
 	var t = setTimeout(function(){setContent();},60000);
 }
@@ -290,8 +307,9 @@ function getWeather(){
 		}
 	}
 };
-httpRequest.open('GET', "https://api.weather.gov/gridpoints/PBZ/67,67/forecast");
-httpRequest.send(); 
+// httpRequest.open('GET', "https://api.weather.gov/gridpoints/PBZ/67,67/forecast");
+// httpRequest.send(); 
+
 }
 </script>
 </head>
